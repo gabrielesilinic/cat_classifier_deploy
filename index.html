@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cat Classifier Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.15.0/dist/tf.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <script src="./app.js"></script>
+    <style>
+        img {
+            max-width: 400px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cat Classifier Demo</h1>
+
+    <input type="file" accept="image/*" id="fileInput">
+    <br>
+    <img id="selectedImage">
+    <br>
+    <button onclick="classifyImage()">Classify</button>
+    <p id="predictionResult"></p>
+
+    <script>
+        // Instantiate CatClassifier
+        let classifier = new CatClassifier('tfjs_model/model.json');
+        classifier.loadModel();
+
+        // Function to handle file input change
+        function handleFileInputChange(event) {
+            let file = event.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let img = document.getElementById('selectedImage');
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            document.getElementById('predictionResult').innerText = '';
+        }
+
+        // Function to perform classification on the selected image
+        async function classifyImage() {
+            let imgElement = document.getElementById('selectedImage');
+            let predictionResult = document.getElementById('predictionResult');
+            let prediction = await classifier.predict(imgElement);
+            predictionResult.innerText = prediction;
+        }
+
+        // Event listener for file input change
+        let fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', handleFileInputChange);
+    </script>
+</body>
+</html>
